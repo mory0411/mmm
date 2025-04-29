@@ -17,8 +17,8 @@ export interface Answer {
   relationship_id: string;
   question_id: string;
   answer_text: string;
-  created_at: string;
   role: Role;
+  created_at: string;
 }
 
 export interface ShareLink {
@@ -26,5 +26,4 @@ export interface ShareLink {
   relationship_id: string;
   hash_code: string;
   created_at: string;
-  expires_at?: string;
 } 
