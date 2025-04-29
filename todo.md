@@ -1,4 +1,4 @@
-# MORI 할 일 목록
+# MORY 할 일 목록
 
 ## 초기 설정 및 구성
 - [ ] Next.js 15 프로젝트 초기화 (App Router)
