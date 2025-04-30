@@ -2,6 +2,7 @@ export type Role = 'child' | 'parent';
 
 export interface Relationship {
   id: string;
+  hash_code: string;
   created_at: string;
 }
 
@@ -20,9 +21,13 @@ export interface Answer {
   created_at: string;
 }
 
-export interface ShareLink {
-  id: string;
-  relationship_id: string;
-  hash_code: string;
-  created_at: string;
+export interface Policy {
+  role: 'authenticated' | 'anon';
+  action: 'SELECT' | 'INSERT' | 'UPDATE' | 'DELETE';
+}
+
+export interface TablePolicies {
+  relationships: Policy[];
+  questions: Policy[];
+  answers: Policy[];
 } 
