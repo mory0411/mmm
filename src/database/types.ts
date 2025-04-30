@@ -8,7 +8,6 @@ export interface Relationship {
 export interface Question {
   id: string;
   text: string;
-  category?: string;
   created_at: string;
 }
 
