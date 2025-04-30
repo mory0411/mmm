@@ -1,11 +1,13 @@
 # MORY 할 일 목록
 
 ## 초기 설정 및 구성
-- [x] Next.js 15 프로젝트 초기화 (App Router)
-- [x] TailwindCSS와 Shadcn 설정
-- [x] Supabase 프로젝트 및 데이터베이스 구성
-- [x] Vercel 배포 설정
-- [x] 기본 프로젝트 구조 생성
+- [ ] Next.js 15 프로젝트 초기화 (App Router)
+- [ ] TailwindCSS와 Shadcn 설정
+- [ ] Supabase 프로젝트 및 데이터베이스 구성
+- [ ] Vercel 배포 설정
+- [ ] 기본 프로젝트 구조 생성
+- [ ] 브랜치 전략 설정 (`on` 브랜치에서 개발)
+- [ ] Git 워크플로우 문서화
 
 ## 데이터베이스 설정
 - [x] Relationships 테이블 생성
