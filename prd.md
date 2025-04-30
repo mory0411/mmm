@@ -69,7 +69,7 @@
 - 모바일 환경에서 빠르고 직관적인 경험 제공
 
 #### 단일 공유 링크
-- 고유 해시 코드 기반 (예: mory.com/r/abc123)
+- relationships 테이블의 hash_code 컬럼을 통한 고유 식별자 제공
 - 관계 ID와 역할 정보 포함 (암호화된 해시)
 - 링크는 만료되지 않음 (관계 지속 기간 동안 사용 가능)
 
@@ -96,12 +96,12 @@
 
 ### Relationships
 - id (PK, UUID): 고유 관계 식별자
+- hash_code (VARCHAR, UNIQUE): 고유 해시 코드 (예: abc123)
 - created_at (TIMESTAMP): 관계 생성 시간
 
 ### Questions
 - id (PK, UUID): 질문 고유 식별자
 - text (TEXT): 질문 내용
-- category (VARCHAR): 질문 카테고리 (예: 가족, 추억)
 - created_at (TIMESTAMP): 질문 생성 시간
 
 ### Answers
@@ -111,12 +111,6 @@
 - answer_text (TEXT, 최대 500자): 답변 내용
 - role (ENUM: 'child', 'parent'): 작성자 역할
 - created_at (TIMESTAMP): 답변 작성 시간
-
-### ShareLinks
-- id (PK, UUID): 링크 고유 식별자
-- relationship_id (FK → Relationships.id): 연관된 관계
-- hash_code (VARCHAR, UNIQUE): 고유 해시 코드 (예: abc123)
-- created_at (TIMESTAMP): 링크 생성 시간
 
 ## 4. 기술 스택
 
