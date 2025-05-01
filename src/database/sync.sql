@@ -38,6 +38,16 @@ ALTER TABLE relationships ENABLE ROW LEVEL SECURITY;
 ALTER TABLE questions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE answers ENABLE ROW LEVEL SECURITY;
 
+-- Drop existing policies
+DROP POLICY IF EXISTS "Allow relationship members read answers" ON answers;
+DROP POLICY IF EXISTS "Allow relationship members create answers" ON answers;
+DROP POLICY IF EXISTS "Allow public read answers" ON answers;
+DROP POLICY IF EXISTS "Allow public create answers" ON answers;
+DROP POLICY IF EXISTS "Allow public read relationships" ON relationships;
+DROP POLICY IF EXISTS "Allow authenticated create relationships" ON relationships;
+DROP POLICY IF EXISTS "Allow public create relationships" ON relationships;
+DROP POLICY IF EXISTS "Allow public read questions" ON questions;
+
 -- Create RLS Policies
 -- Relationships: 누구나 읽기/쓰기 가능
 CREATE POLICY "Allow public read relationships" ON relationships
@@ -53,4 +63,17 @@ CREATE POLICY "Allow public read questions" ON questions
 CREATE POLICY "Allow public read answers" ON answers
     FOR SELECT USING (true);
 CREATE POLICY "Allow public create answers" ON answers
-    FOR INSERT WITH CHECK (true); 
+    FOR INSERT WITH CHECK (true);
+
+-- Insert dummy questions
+INSERT INTO questions (text) VALUES
+    ('오늘 하루 중 가장 기억에 남는 순간은 무엇인가요?'),
+    ('어린 시절 가장 재미있었던 놀이는 무엇인가요?'),
+    ('우리 가족만의 특별한 전통이나 규칙이 있나요?'),
+    ('지금까지 가장 행복했던 가족 여행은 언제인가요?'),
+    ('부모님/자녀에게 가장 감사한 점은 무엇인가요?'),
+    ('우리 가족의 장점은 무엇이라고 생각하나요?'),
+    ('가족과 함께 하고 싶은 버킷리스트가 있나요?'),
+    ('우리 가족의 첫 만남을 기억하시나요?'),
+    ('가족에게 전하지 못한 마음이 있다면 무엇인가요?'),
+    ('우리 가족의 미래 모습을 상상해본다면 어떨까요?'); 
