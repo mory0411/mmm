@@ -42,7 +42,7 @@ export default function Dashboard() {
               <div>내 역할: {rel.parent_user_id === user.id ? "부모" : "자녀"}</div>
               <div className="text-xs text-gray-400">생성일: {rel.created_at?.slice(0, 10)}</div>
             </div>
-            <Link href={`/app/r/${rel.hash_code}`}>
+            <Link href={`/r/${rel.hash_code}`}>
               <Button>입장</Button>
             </Link>
           </div>
