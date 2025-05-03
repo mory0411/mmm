@@ -13,6 +13,10 @@ export default function RelationshipRoom() {
   const [relationship, setRelationship] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [questions, setQuestions] = useState<any[]>([]);
+  const [answers, setAnswers] = useState<any[]>([]);
+  const [answerInputs, setAnswerInputs] = useState<{ [questionId: string]: string }>({});
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
@@ -34,6 +38,23 @@ export default function RelationshipRoom() {
         setLoading(false);
       });
   }, [hash]);
+
+  useEffect(() => {
+    supabase
+      .from("questions")
+      .select("*")
+      .order("id", { ascending: true })
+      .then(({ data }) => setQuestions(data || []));
+  }, []);
+
+  useEffect(() => {
+    if (!relationship) return;
+    supabase
+      .from("answers")
+      .select("*")
+      .eq("relationship_id", relationship.id)
+      .then(({ data }) => setAnswers(data || []));
+  }, [relationship, saving]);
 
   // 이미 참여 중이면 Q&A로 이동 or Q&A UI 표시
   useEffect(() => {
@@ -61,6 +82,23 @@ export default function RelationshipRoom() {
     }
   };
 
+  const handleSaveAnswer = async (questionId: number) => {
+    if (!user || !relationship) return;
+    setSaving(true);
+    const myRole = relationship.parent_user_id === user.id ? "parent" : "child";
+    const answerText = answerInputs[questionId];
+    if (!answerText) return;
+    await supabase.from("answers").upsert({
+      relationship_id: relationship.id,
+      question_id: questionId,
+      user_id: user.id,
+      answer_text: answerText,
+      role: myRole,
+    });
+    setAnswerInputs((prev) => ({ ...prev, [questionId]: "" }));
+    setSaving(false);
+  };
+
   if (loading) return <div>로딩 중...</div>;
   if (error) return <div>{error}</div>;
 
@@ -82,12 +120,61 @@ export default function RelationshipRoom() {
     );
   }
 
-  // TODO: Q&A UI로 대체
+  if (!user || !relationship) return null;
+
+  const myRole = relationship.parent_user_id === user.id ? "parent" : "child";
+  const otherRole = myRole === "parent" ? "child" : "parent";
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
-      <h1>Q&A 화면 (준비 중)</h1>
-      <p>관계 코드: {relationship.hash_code}</p>
-      <p>내 역할: {relationship.parent_user_id === user.id ? "부모" : "자녀"}</p>
+    <div className="max-w-xl mx-auto py-8">
+      <h1 className="text-xl font-bold mb-4">Q&A</h1>
+      <div className="space-y-8">
+        {questions.map((q) => {
+          const myAnswer = answers.find(
+            (a) => a.question_id === q.id && a.role === myRole
+          );
+          const otherAnswer = answers.find(
+            (a) => a.question_id === q.id && a.role === otherRole
+          );
+          return (
+            <div key={q.id} className="border rounded p-4">
+              <div className="font-semibold mb-2">Q. {q.text}</div>
+              <div className="mb-2">
+                <div className="text-sm text-gray-500 mb-1">내 답변</div>
+                {myAnswer ? (
+                  <div className="p-2 bg-gray-100 rounded">{myAnswer.answer_text}</div>
+                ) : (
+                  <div className="flex gap-2">
+                    <input
+                      className="border rounded px-2 py-1 flex-1"
+                      value={answerInputs[q.id] || ""}
+                      onChange={(e) =>
+                        setAnswerInputs((prev) => ({ ...prev, [q.id]: e.target.value }))
+                      }
+                      placeholder="답변을 입력하세요"
+                      maxLength={500}
+                    />
+                    <Button
+                      onClick={() => handleSaveAnswer(q.id)}
+                      disabled={saving || !(answerInputs[q.id] && answerInputs[q.id].trim())}
+                    >
+                      저장
+                    </Button>
+                  </div>
+                )}
+              </div>
+              <div>
+                <div className="text-sm text-gray-500 mb-1">상대 답변</div>
+                {otherAnswer ? (
+                  <div className="p-2 bg-gray-50 rounded">{otherAnswer.answer_text}</div>
+                ) : (
+                  <div className="text-gray-300">아직 답변이 없습니다.</div>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 } 
