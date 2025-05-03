@@ -1,0 +1,39 @@
+# MORY Project Rules
+
+## GitHub Repository
+- Repository: https://github.com/yourusername/mory
+- Branch Strategy:
+  - `main`: 프로덕션 브랜치
+  - `develop`: 개발 브랜치
+  - `feature/*`: 기능 개발 브랜치
+  - `hotfix/*`: 긴급 수정 브랜치
+
+## Development Rules
+1. 컴포넌트는 shadcn 우선 사용
+2. Supabase와 데이터 연동할 때는 @types.ts 확인
+3. Todo 리스트:
+   - [ ] 기본 페이지 구조 설정
+   - [ ] 카카오 로그인 구현
+   - [ ] 관계 생성 기능 구현
+   - [ ] 답변 작성 기능 구현
+   - [ ] 과거 대화 보기 기능 구현
+
+## Code Style
+- TypeScript strict mode 사용
+- ESLint + Prettier 설정 준수
+- 컴포넌트는 Server Component 우선
+- 클라이언트 컴포넌트는 'use client' 명시
+
+## Database
+- Supabase 사용
+- RLS 정책 준수
+- 마이그레이션은 sync.sql 관리
+
+## UI/UX
+- 모바일 우선 반응형
+- shadcn 컴포넌트 우선 사용
+- 다크모드 지원
+
+## Testing
+- MVP 단계에서는 핵심 기능 테스트에 집중
+- E2E 테스트는 추후 추가 
