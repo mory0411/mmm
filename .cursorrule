@@ -1,7 +1,7 @@
 # MORY Project Rules
 
 ## GitHub Repository
-- Repository: https://github.com/yourusername/mory
+- Repository: https://github.com/mory0411/mmm
 - Branch Strategy:
   - `main`: 프로덕션 브랜치
   - `develop`: 개발 브랜치
