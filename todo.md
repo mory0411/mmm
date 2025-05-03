@@ -10,10 +10,10 @@
 ---
 
 ## 2. 인증 및 프로필
-- [ ] Supabase Auth + Kakao OAuth 연동
-- [ ] 로그인/로그아웃 기능 구현
-- [ ] 최초 로그인 시 닉네임 동기화
-- [ ] 자동 로그인/세션 관리
+- [x] Supabase Auth + Kakao OAuth 연동
+- [x] 로그인/로그아웃 기능 구현
+- [x] 최초 로그인 시 닉네임 동기화
+- [x] 자동 로그인/세션 관리
 - [ ] 프로필 정보 조회/수정 UI
 
 ---
@@ -29,11 +29,11 @@
 
 ## 4. 주요 페이지 및 라우팅
 - [x] / (메인): 서비스 소개, 시작하기 버튼
-- [ ] /auth/login: 카카오 로그인 버튼, 리다이렉트 처리
-- [ ] /auth/callback: OAuth 콜백 처리
-- [ ] /app: 대시보드(참여 중인 관계 목록, 새 관계 생성)
+- [x] /auth/login: 카카오 로그인 버튼, 리다이렉트 처리
+- [x] /auth/callback: OAuth 콜백 처리
+- [x] /app: 대시보드(참여 중인 관계 목록, 새 관계 생성)
 - [ ] /app/r/[hash]: 공유 링크 접속, 역할 선택, 질문/답변, 타임라인
-- [ ] /app/create: 새로운 관계 생성, 역할 선택, 링크 복사
+- [x] /app/create: 새로운 관계 생성, 역할 선택, 링크 복사
 - [ ] /app/history/[hash]: 관계별 Q&A 히스토리, 날짜/키워드 필터
 - [ ] /app/settings: 프로필 설정, 로그아웃
 - [ ] 각 페이지별 loading, error 처리
@@ -52,7 +52,7 @@
 ---
 
 ## 6. 서버/클라이언트 데이터 처리
-- [ ] supabase client.ts, auth.ts 구현
+- [x] supabase client.ts, auth.ts 구현
 - [ ] SSR: 관계/질문/답변 데이터 로드
 - [ ] Server Actions: 관계 생성, 답변 저장, 역할 검증 트랜잭션
 - [ ] 실시간 구독(answers)로 답변 알림 UI
