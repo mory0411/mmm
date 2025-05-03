@@ -17,13 +17,7 @@ CREATE TABLE relationships (
     hash_code VARCHAR UNIQUE NOT NULL,
     child_user_id UUID REFERENCES auth.users ON DELETE SET NULL,
     parent_user_id UUID REFERENCES auth.users ON DELETE SET NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    CHECK (child_user_id != parent_user_id),
-    CHECK (
-        (child_user_id IS NOT NULL AND parent_user_id IS NULL) OR
-        (child_user_id IS NULL AND parent_user_id IS NOT NULL) OR
-        (child_user_id IS NOT NULL AND parent_user_id IS NOT NULL)
-    )
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Create Questions table
@@ -42,38 +36,14 @@ CREATE TABLE answers (
     answer_text TEXT NOT NULL CHECK (char_length(answer_text) <= 500),
     role TEXT NOT NULL CHECK (role IN ('child', 'parent')),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE (relationship_id, question_id, role),
-    CHECK (
-        (role = 'child' AND user_id = (SELECT child_user_id FROM relationships WHERE id = relationship_id)) OR
-        (role = 'parent' AND user_id = (SELECT parent_user_id FROM relationships WHERE id = relationship_id))
-    ),
-    CHECK (
-        (role = 'child' AND (SELECT child_user_id FROM relationships WHERE id = relationship_id) IS NOT NULL) OR
-        (role = 'parent' AND (SELECT parent_user_id FROM relationships WHERE id = relationship_id) IS NOT NULL)
-    )
+    UNIQUE (relationship_id, question_id, role)
 );
-
--- Create indexes
-CREATE INDEX idx_answers_relationship_id ON answers(relationship_id);
-CREATE INDEX idx_answers_question_id ON answers(question_id);
-CREATE INDEX idx_relationships_hash_code ON relationships(hash_code);
-CREATE INDEX idx_relationships_child_user_id ON relationships(child_user_id);
-CREATE INDEX idx_relationships_parent_user_id ON relationships(parent_user_id);
 
 -- Enable RLS
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE relationships ENABLE ROW LEVEL SECURITY;
 ALTER TABLE questions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE answers ENABLE ROW LEVEL SECURITY;
-
--- Drop existing policies
-DROP POLICY IF EXISTS "Allow public read answers" ON answers;
-DROP POLICY IF EXISTS "Allow public create answers" ON answers;
-DROP POLICY IF EXISTS "Allow public read relationships" ON relationships;
-DROP POLICY IF EXISTS "Allow public create relationships" ON relationships;
-DROP POLICY IF EXISTS "Allow public read questions" ON questions;
-DROP POLICY IF EXISTS "Allow public read profiles" ON profiles;
-DROP POLICY IF EXISTS "Allow public create profiles" ON profiles;
 
 -- Create RLS Policies
 -- Profiles: 누구나 읽기/쓰기 가능
@@ -98,23 +68,10 @@ CREATE POLICY "Allow public read answers" ON answers
 CREATE POLICY "Allow public create answers" ON answers
     FOR INSERT WITH CHECK (true);
 
--- Create function to handle new user signup
-CREATE OR REPLACE FUNCTION public.handle_new_user()
-RETURNS TRIGGER AS $$
-BEGIN
-    INSERT INTO public.profiles (id, nickname)
-    VALUES (
-        NEW.id,
-        NEW.raw_user_meta_data->>'nickname'
-    );
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
--- Create trigger for new user signup
-CREATE OR REPLACE TRIGGER on_auth_user_created
-    AFTER INSERT ON auth.users
-    FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+-- Insert dummy users
+INSERT INTO auth.users (id, email, raw_user_meta_data) VALUES
+    ('00000000-0000-0000-0000-000000000001', 'child@example.com', '{"nickname": "자녀"}'),
+    ('00000000-0000-0000-0000-000000000002', 'parent@example.com', '{"nickname": "부모"}');
 
 -- Insert dummy questions
 INSERT INTO questions (text) VALUES
