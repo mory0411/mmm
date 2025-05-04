@@ -19,7 +19,7 @@ export default function AuthCallback() {
           nickname,
         });
       }
-      router.replace('/app');
+      router.replace('/');
     };
     syncProfile();
   }, [router]);
