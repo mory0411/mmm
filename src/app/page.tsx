@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { toast } from "sonner";
 
 export default function Dashboard() {
   const [user, setUser] = useState<any>(null);
@@ -144,7 +145,7 @@ export default function Dashboard() {
               </Link>
               <Button variant="secondary" size="sm" onClick={() => {
                 navigator.clipboard.writeText(`${window.location.origin}/r/${rel.hash_code}`);
-                alert('공유 링크가 복사되었습니다!');
+                toast("공유 링크가 복사되었습니다!");
               }}>
                 공유하기
               </Button>

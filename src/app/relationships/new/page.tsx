@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
+import { toast } from "sonner";
 
 export default function NewRelationship() {
   const [role, setRole] = useState<'parent' | 'child'>('parent');
@@ -84,7 +85,10 @@ export default function NewRelationship() {
       {hashCode && (
         <div className="mt-4">
           <p>생성된 관계 코드: {hashCode}</p>
-          <Button onClick={() => navigator.clipboard.writeText(`https://mmm-brown.vercel.app/r/${hashCode}`)}>
+          <Button onClick={() => {
+            navigator.clipboard.writeText(`https://mmm-brown.vercel.app/r/${hashCode}`);
+            toast("공유 링크가 복사되었습니다!");
+          }}>
             주소 복사 및 공유하기
           </Button>
         </div>
