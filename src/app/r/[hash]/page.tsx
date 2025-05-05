@@ -144,7 +144,10 @@ export default function RelationshipRoom() {
   if (loading) return <div>로딩 중...</div>;
   if (error) return <div>{error}</div>;
 
-  // 아직 참여하지 않은 경우 역할 선택 UI
+  // 역할 선택 UI
+  const parentJoined = !!relationship.parent_user_id;
+  const childJoined = !!relationship.child_user_id;
+
   if (
     relationship &&
     relationship.parent_user_id !== user?.id &&
@@ -153,10 +156,26 @@ export default function RelationshipRoom() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
         <h1>관계 참여</h1>
-        <p>이 관계에 어떤 역할로 참여하시겠습니까?</p>
+        {parentJoined && !childJoined && (
+          <p className="text-sm text-gray-500 mb-2">상대방(부모)이 이미 참여했습니다. 자녀로만 참여할 수 있습니다.</p>
+        )}
+        {childJoined && !parentJoined && (
+          <p className="text-sm text-gray-500 mb-2">상대방(자녀)이 이미 참여했습니다. 부모로만 참여할 수 있습니다.</p>
+        )}
+        {!parentJoined && !childJoined && (
+          <p className="text-sm text-gray-500 mb-2">아직 아무도 참여하지 않았습니다. 원하는 역할을 선택하세요.</p>
+        )}
         <div className="flex gap-4 mt-4">
-          <Button onClick={() => handleRoleSelect("parent")}>부모로 참여</Button>
-          <Button onClick={() => handleRoleSelect("child")}>자녀로 참여</Button>
+          <Button onClick={() => handleRoleSelect("parent")}
+            disabled={parentJoined}
+          >
+            부모로 참여
+          </Button>
+          <Button onClick={() => handleRoleSelect("child")}
+            disabled={childJoined}
+          >
+            자녀로 참여
+          </Button>
         </div>
       </div>
     );
