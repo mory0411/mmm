@@ -79,11 +79,15 @@ export default function Dashboard() {
 
   const handleSaveName = async (relId: string) => {
     if (!user) return;
-    await supabase.from("relationship_names").upsert({
+    const { error } = await supabase.from("relationship_names").upsert({
       relationship_id: relId,
       user_id: user.id,
       name: editNameValue.trim(),
     });
+    if (error) {
+      alert("저장 실패: " + error.message);
+      return;
+    }
     setMyRelationshipNames((prev) => ({ ...prev, [relId]: editNameValue.trim() }));
     setEditNameId(null);
   };

@@ -42,12 +42,11 @@ CREATE TABLE answers (
 
 -- 각 사용자의 관계별 이름(별칭) 저장 테이블
 CREATE TABLE relationship_names (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     relationship_id UUID REFERENCES relationships(id) ON DELETE CASCADE,
     user_id UUID REFERENCES auth.users ON DELETE CASCADE,
     name VARCHAR,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE (relationship_id, user_id)
+    PRIMARY KEY (relationship_id, user_id)
 );
 
 -- Enable RLS
