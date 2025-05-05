@@ -72,14 +72,18 @@ export default function RelationshipRoom() {
     if (!user || !relationship) return;
     const updateField =
       role === "parent" ? { parent_user_id: user.id } : { child_user_id: user.id };
-    const { error } = await supabase
+    const { error, data } = await supabase
       .from("relationships")
       .update(updateField)
-      .eq("id", relationship.id);
-    if (!error) {
-      // 새로고침하여 참여 상태 반영
-      location.reload();
+      .eq("id", relationship.id)
+      .select()
+      .single();
+
+    if (error) {
+      alert("참여에 실패했습니다: " + error.message);
+      return;
     }
+    setRelationship({ ...relationship, ...updateField });
   };
 
   const handleSaveAnswer = async (questionId: number) => {
