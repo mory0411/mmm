@@ -138,9 +138,17 @@ export default function Dashboard() {
               </div>
               <div className="text-sm mb-1">내 역할: {rel.parent_user_id === user.id ? "부모" : "자녀"}</div>
             </div>
-            <Link href={`/r/${rel.hash_code}`}>
-              <Button>입장</Button>
-            </Link>
+            <div className="flex flex-col gap-2 items-end">
+              <Link href={`/r/${rel.hash_code}`}>
+                <Button>입장</Button>
+              </Link>
+              <Button variant="secondary" size="sm" onClick={() => {
+                navigator.clipboard.writeText(`${window.location.origin}/r/${rel.hash_code}`);
+                alert('공유 링크가 복사되었습니다!');
+              }}>
+                공유하기
+              </Button>
+            </div>
           </div>
         ))}
       </div>
