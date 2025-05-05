@@ -128,7 +128,7 @@ export default function Dashboard() {
                   <>
                     {myRelationshipNames[rel.id] || <span className="text-gray-400">(별칭 없음)</span>}
                     <Button size="sm" variant="outline" onClick={() => handleEditName(rel.id)}>
-                      수정
+                      수정버튼
                     </Button>
                   </>
                 )}
