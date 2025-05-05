@@ -65,8 +65,8 @@ export default function NewRelationship() {
       {hashCode && (
         <div className="mt-4">
           <p>생성된 관계 코드: {hashCode}</p>
-          <Button onClick={() => navigator.clipboard.writeText(hashCode)}>
-            복사
+          <Button onClick={() => navigator.clipboard.writeText(`https://mmm-brown.vercel.app/r/${hashCode}`)}>
+            주소 복사 및 공유하기
           </Button>
         </div>
       )}
