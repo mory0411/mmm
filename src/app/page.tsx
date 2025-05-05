@@ -11,6 +11,7 @@ export default function Dashboard() {
   const [myRelationshipNames, setMyRelationshipNames] = useState<{ [relationshipId: string]: string }>({});
   const [editNameId, setEditNameId] = useState<string | null>(null);
   const [editNameValue, setEditNameValue] = useState<string>("");
+  const [otherProfiles, setOtherProfiles] = useState<{ [relationshipId: string]: { nickname?: string; email?: string } }>({});
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
@@ -40,6 +41,35 @@ export default function Dashboard() {
       setMyRelationshipNames(nameMap);
     };
     fetchNames();
+  }, [user, relationships]);
+
+  useEffect(() => {
+    if (!user || relationships.length === 0) return;
+    const fetchOthers = async () => {
+      const otherUserIds = relationships.map((rel) => {
+        if (rel.parent_user_id === user.id) return rel.child_user_id;
+        if (rel.child_user_id === user.id) return rel.parent_user_id;
+        return null;
+      }).filter(Boolean);
+      if (otherUserIds.length === 0) return;
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("id, nickname")
+        .in("id", otherUserIds);
+      const profileMap: { [id: string]: { nickname?: string } } = {};
+      (profiles || []).forEach((p) => {
+        profileMap[p.id] = { nickname: p.nickname };
+      });
+      const relMap: { [relationshipId: string]: { nickname?: string } } = {};
+      relationships.forEach((rel) => {
+        const otherId = rel.parent_user_id === user.id ? rel.child_user_id : rel.parent_user_id;
+        if (otherId && profileMap[otherId]) {
+          relMap[rel.id] = profileMap[otherId];
+        }
+      });
+      setOtherProfiles(relMap);
+    };
+    fetchOthers();
   }, [user, relationships]);
 
   const handleEditName = (relId: string) => {
@@ -74,12 +104,9 @@ export default function Dashboard() {
         {relationships.map((rel) => (
           <div key={rel.id} className="border rounded p-4 flex justify-between items-center">
             <div>
-              <div className="font-semibold">관계 코드: {rel.hash_code}</div>
-              <div>내 역할: {rel.parent_user_id === user.id ? "부모" : "자녀"}</div>
-              <div className="text-xs text-gray-400">생성일: {rel.created_at?.slice(0, 10)}</div>
-              <div className="text-sm mt-1">
-                내 별칭: {editNameId === rel.id ? (
-                  <span className="flex gap-2 items-center">
+              <div className="text-lg font-bold mb-1 flex items-center gap-2">
+                {editNameId === rel.id ? (
+                  <>
                     <input
                       className="border rounded px-2 py-1"
                       value={editNameValue}
@@ -92,16 +119,20 @@ export default function Dashboard() {
                     <Button size="sm" variant="ghost" onClick={() => setEditNameId(null)}>
                       취소
                     </Button>
-                  </span>
+                  </>
                 ) : (
-                  <span className="flex gap-2 items-center">
-                    {myRelationshipNames[rel.id] || <span className="text-gray-400">(미지정)</span>}
+                  <>
+                    {myRelationshipNames[rel.id] || <span className="text-gray-400">(별칭 없음)</span>}
                     <Button size="sm" variant="outline" onClick={() => handleEditName(rel.id)}>
                       수정
                     </Button>
-                  </span>
+                  </>
                 )}
               </div>
+              <div className="text-sm mb-1">
+                상대방: {otherProfiles[rel.id]?.nickname ? otherProfiles[rel.id].nickname : <span className="text-gray-400">(미참여)</span>}
+              </div>
+              <div className="text-sm mb-1">내 역할: {rel.parent_user_id === user.id ? "부모" : "자녀"}</div>
             </div>
             <Link href={`/r/${rel.hash_code}`}>
               <Button>입장</Button>
