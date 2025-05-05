@@ -17,6 +17,9 @@ export default function RelationshipRoom() {
   const [answers, setAnswers] = useState<any[]>([]);
   const [answerInputs, setAnswerInputs] = useState<{ [questionId: string]: string }>({});
   const [saving, setSaving] = useState(false);
+  const [myRelationshipName, setMyRelationshipName] = useState<string>("");
+  const [nameLoading, setNameLoading] = useState(true);
+  const [nameEdit, setNameEdit] = useState(false);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
@@ -68,6 +71,22 @@ export default function RelationshipRoom() {
     }
   }, [user, relationship, hash, router]);
 
+  // 내 별칭 불러오기
+  useEffect(() => {
+    if (!user || !relationship) return;
+    setNameLoading(true);
+    supabase
+      .from("relationship_names")
+      .select("name")
+      .eq("relationship_id", relationship.id)
+      .eq("user_id", user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        setMyRelationshipName(data?.name || "");
+        setNameLoading(false);
+      });
+  }, [user, relationship]);
+
   const handleRoleSelect = async (role: "parent" | "child") => {
     if (!user || !relationship) return;
     const updateField =
@@ -77,10 +96,14 @@ export default function RelationshipRoom() {
       .update(updateField)
       .eq("id", relationship.id)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) {
       alert("참여에 실패했습니다: " + error.message);
+      return;
+    }
+    if (!data) {
+      alert("참여에 실패했습니다. 이미 참여했거나, 권한이 없거나, 관계가 존재하지 않습니다.");
       return;
     }
     setRelationship({ ...relationship, ...updateField });
@@ -101,6 +124,21 @@ export default function RelationshipRoom() {
     });
     setAnswerInputs((prev) => ({ ...prev, [questionId]: "" }));
     setSaving(false);
+  };
+
+  // 별칭 저장
+  const handleSaveName = async () => {
+    if (!user || !relationship) return;
+    setNameLoading(true);
+    await supabase
+      .from("relationship_names")
+      .upsert({
+        relationship_id: relationship.id,
+        user_id: user.id,
+        name: myRelationshipName,
+      });
+    setNameEdit(false);
+    setNameLoading(false);
   };
 
   if (loading) return <div>로딩 중...</div>;
@@ -178,6 +216,32 @@ export default function RelationshipRoom() {
             </div>
           );
         })}
+      </div>
+      {/* 내 별칭 입력/수정 UI */}
+      <div className="mb-6">
+        {nameLoading ? (
+          <span className="text-gray-400">별칭 불러오는 중...</span>
+        ) : nameEdit || !myRelationshipName ? (
+          <div className="flex gap-2 items-center">
+            <input
+              className="border rounded px-2 py-1 flex-1"
+              value={myRelationshipName}
+              onChange={e => setMyRelationshipName(e.target.value)}
+              placeholder="이 관계를 부를 이름을 입력하세요"
+              maxLength={30}
+            />
+            <Button size="sm" onClick={handleSaveName} disabled={!myRelationshipName.trim()}>
+              저장
+            </Button>
+          </div>
+        ) : (
+          <div className="flex gap-2 items-center">
+            <span className="font-semibold">내 별칭: {myRelationshipName}</span>
+            <Button size="sm" variant="outline" onClick={() => setNameEdit(true)}>
+              수정
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

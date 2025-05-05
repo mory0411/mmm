@@ -8,6 +8,7 @@ export default function NewRelationship() {
   const [role, setRole] = useState<'parent' | 'child'>('parent');
   const [hashCode, setHashCode] = useState<string | null>(null);
   const [user, setUser] = useState<any>(null);
+  const [myRelationshipName, setMyRelationshipName] = useState("");
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
@@ -32,6 +33,15 @@ export default function NewRelationship() {
       return;
     }
 
+    // 관계 생성과 동시에 내 별칭 저장
+    if (myRelationshipName.trim()) {
+      await supabase.from('relationship_names').upsert({
+        relationship_id: data.id,
+        user_id: user.id,
+        name: myRelationshipName.trim(),
+      });
+    }
+
     setHashCode(data.hash_code);
   };
 
@@ -41,25 +51,34 @@ export default function NewRelationship() {
         <div className="mb-4 text-sm text-gray-600">로그인: {user.user_metadata?.nickname || user.email}</div>
       )}
       <h1>새 관계 생성</h1>
-      <div className="flex gap-4 my-4">
-        <label className="flex items-center space-x-2">
-          <input
-            type="radio"
-            value="parent"
-            checked={role === 'parent'}
-            onChange={() => setRole('parent')}
-          />
-          <span>부모</span>
-        </label>
-        <label className="flex items-center space-x-2">
-          <input
-            type="radio"
-            value="child"
-            checked={role === 'child'}
-            onChange={() => setRole('child')}
-          />
-          <span>자녀</span>
-        </label>
+      <div className="flex flex-col gap-2 my-4 w-full max-w-xs">
+        <div className="flex gap-4">
+          <label className="flex items-center space-x-2">
+            <input
+              type="radio"
+              value="parent"
+              checked={role === 'parent'}
+              onChange={() => setRole('parent')}
+            />
+            <span>부모</span>
+          </label>
+          <label className="flex items-center space-x-2">
+            <input
+              type="radio"
+              value="child"
+              checked={role === 'child'}
+              onChange={() => setRole('child')}
+            />
+            <span>자녀</span>
+          </label>
+        </div>
+        <input
+          className="border rounded px-2 py-1"
+          value={myRelationshipName}
+          onChange={e => setMyRelationshipName(e.target.value)}
+          placeholder="이 관계를 부를 이름을 입력하세요"
+          maxLength={30}
+        />
       </div>
       <Button onClick={handleCreateRelationship}>관계 생성</Button>
       {hashCode && (
