@@ -105,7 +105,7 @@ export default function Dashboard() {
         <Button className="mb-6">+ 새 관계 생성</Button>
       </Link>
       <div className="space-y-4">
-        {relationships.length === 0 && <div>참여 중인 관계가 없습니다.</div>}
+        {relationships.length === 0 && <div>참여 중인 관계가 없습요.</div>}
         {relationships.map((rel) => (
           <div key={rel.id} className="border rounded p-4 flex justify-between items-center">
             <div>
