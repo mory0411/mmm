@@ -126,17 +126,25 @@ CREATE POLICY "Allow all operations on question_history" ON question_history
 CREATE OR REPLACE FUNCTION update_question_statuses()
 RETURNS void AS $$
 BEGIN
-    -- today, 1-reply를 not_done으로 변경
+    -- 1. 1-reply 상태의 답변 삭제
+    DELETE FROM answers
+    WHERE (relationship_id, question_id) IN (
+        SELECT relationship_id, question_id
+        FROM question_history
+        WHERE status = '1-reply'
+    );
+
+    -- 2. today, 1-reply를 not_done으로 변경
     UPDATE question_history
     SET status = 'not_done'
     WHERE status IN ('today', '1-reply');
 
-    -- 2-reply를 done으로 변경
+    -- 3. 2-reply를 done으로 변경
     UPDATE question_history
     SET status = 'done'
     WHERE status = '2-reply';
 
-    -- 각 관계별로 not_done 중 랜덤 1개를 today로 변경
+    -- 4. 각 관계별로 not_done 중 랜덤 1개를 today로 변경
     WITH rels AS (
         SELECT DISTINCT relationship_id FROM question_history
     ),
