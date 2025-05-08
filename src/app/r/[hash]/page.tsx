@@ -17,6 +17,7 @@ export default function RelationshipDetailPage() {
   const [submitting, setSubmitting] = useState(false);
   const [myAnswer, setMyAnswer] = useState<any>(null);
   const [myTodayAnswer, setMyTodayAnswer] = useState<any>(null);
+  const [todayAnswers, setTodayAnswers] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchTodayQuestion = async () => {
@@ -88,6 +89,23 @@ export default function RelationshipDetailPage() {
     };
     if (relationshipId && question) fetchMyTodayAnswer();
   }, [relationshipId, question, submitting]);
+
+  useEffect(() => {
+    // 오늘의 질문이 2-reply일 때 부모/자녀 답변 모두 불러오기
+    const fetchTodayAnswers = async () => {
+      if (!relationshipId || !question || question.status !== "2-reply") {
+        setTodayAnswers([]);
+        return;
+      }
+      const { data } = await supabase
+        .from("answers")
+        .select("*")
+        .eq("relationship_id", relationshipId)
+        .eq("question_id", question.question_id);
+      setTodayAnswers(data || []);
+    };
+    fetchTodayAnswers();
+  }, [relationshipId, question]);
 
   const handleSubmit = async () => {
     if (!answer.trim() || !relationshipId || !question) return;
@@ -200,9 +218,33 @@ export default function RelationshipDetailPage() {
             )
           )}
           {question.status === "2-reply" && (
-            <div className="text-green-600 font-semibold">오늘의 질문, 모두 답변 완료!</div>
+            <>
+              <div className="text-green-600 font-semibold mb-2">오늘의 질문, 모두 답변 완료!</div>
+              {todayAnswers.length > 0 && (
+                <div className="flex flex-row gap-4 mt-2">
+                  <div className="flex-1 bg-blue-50 rounded p-2">
+                    <span className="font-bold text-blue-700">부모: </span>
+                    {todayAnswers.find(a => a.role === "parent")?.answer_text || <span className="text-gray-400">아직 답변 없음</span>}
+                    {todayAnswers.find(a => a.role === "parent") && (
+                      <span className="text-xs text-gray-400 ml-2">
+                        {new Date(todayAnswers.find(a => a.role === "parent").created_at).toLocaleString()}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex-1 bg-green-50 rounded p-2">
+                    <span className="font-bold text-green-700">자녀: </span>
+                    {todayAnswers.find(a => a.role === "child")?.answer_text || <span className="text-gray-400">아직 답변 없음</span>}
+                    {todayAnswers.find(a => a.role === "child") && (
+                      <span className="text-xs text-gray-400 ml-2">
+                        {new Date(todayAnswers.find(a => a.role === "child").created_at).toLocaleString()}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
+            </>
           )}
-          {myTodayAnswer && (
+          {myTodayAnswer && question.status !== "2-reply" && (
             <div className="mt-6 p-4 border rounded bg-blue-50">
               <div className="text-xs text-gray-500 mb-1">내 답변</div>
               <div className="font-medium">{myTodayAnswer.answer_text}</div>
