@@ -165,16 +165,28 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- 모든 질문을 특정 관계의 question_history에 not_done으로 추가하는 함수
+-- 모든 질문을 특정 관계의 question_history에 not_done으로 추가하고, 그 중 하나를 today로 변경하는 함수
 CREATE OR REPLACE FUNCTION add_all_questions_to_history(rel_id UUID)
 RETURNS void AS $$
 BEGIN
+  -- 1. 모든 질문 not_done으로 추가
   INSERT INTO question_history (relationship_id, question_id, status)
   SELECT rel_id, q.id, 'not_done'
   FROM questions q
   WHERE NOT EXISTS (
     SELECT 1 FROM question_history
     WHERE relationship_id = rel_id AND question_id = q.id
+  );
+
+  -- 2. 그 중 하나를 랜덤으로 today로 변경
+  UPDATE question_history
+  SET status = 'today'
+  WHERE id = (
+    SELECT id FROM question_history
+    WHERE relationship_id = rel_id
+      AND status = 'not_done'
+    ORDER BY RANDOM()
+    LIMIT 1
   );
 END;
 $$ LANGUAGE plpgsql;
