@@ -43,6 +43,10 @@ export default function NewRelationship() {
       });
     }
 
+    await supabase.rpc('add_all_questions_to_history', {
+      rel_id: data.id
+    });
+
     setHashCode(data.hash_code);
   };
 
