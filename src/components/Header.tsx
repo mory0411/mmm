@@ -18,11 +18,11 @@ export default function Header() {
   };
 
   return (
-    <header className="w-full flex justify-between items-center px-4 py-2 border-b">
-      <Link href="/" className="font-bold text-lg">MORY</Link>
+    <header className="w-full flex justify-between items-center px-6 py-4 border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
+      <Link href="/" className="font-bold text-xl text-primary">MORY</Link>
       {user ? (
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-600">
+        <div className="flex items-center gap-4">
+          <span className="text-sm text-muted-foreground">
             {user.user_metadata?.nickname || user.email} 님
           </span>
           <Button variant="outline" size="sm" onClick={handleLogout}>로그아웃</Button>

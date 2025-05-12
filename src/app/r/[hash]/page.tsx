@@ -171,12 +171,12 @@ export default function RelationshipDetailPage() {
 
   return (
     <div className="max-w-xl mx-auto py-8">
-      <div className="flex justify-end mb-4">
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-bold">오늘의 질문</h1>
         <Link href={`/r/${hash}/history`}>
           <Button variant="outline" size="sm">과거 질문-답변 보기</Button>
         </Link>
       </div>
-      <h1 className="text-2xl font-bold mb-4">오늘의 질문</h1>
       {loading ? (
         <div className="text-gray-400">로딩 중...</div>
       ) : question ? (
@@ -216,10 +216,10 @@ export default function RelationshipDetailPage() {
           )}
           {question.status === "1-reply" && (
             myAnswer ? (
-              <div className="text-blue-600 font-semibold">상대방 답변 대기 중입니다.</div>
+              <div className="text-primary font-semibold">상대방 답변 대기 중입니다.</div>
             ) : (
               <>
-                <div className="text-gray-500 mb-2">상대방이 먼저 답변했습니다. 내 답변을 입력하세요!</div>
+                <div className="text-muted-foreground mb-2">상대방이 먼저 답변했습니다. 내 답변을 입력하세요!</div>
                 <Textarea
                   className="mb-2"
                   value={answer}
@@ -236,23 +236,23 @@ export default function RelationshipDetailPage() {
           )}
           {question.status === "2-reply" && (
             <>
-              <div className="text-green-600 font-semibold mb-2">오늘의 질문, 모두 답변 완료!</div>
+              <div className="text-primary font-semibold mb-2">오늘의 질문, 모두 답변 완료!</div>
               {todayAnswers.length > 0 && (
-                <div className="flex flex-row gap-4 mt-2">
-                  <div className="flex-1 bg-blue-50 rounded p-2">
-                    <span className="font-bold text-blue-700">부모: </span>
-                    {todayAnswers.find(a => a.role === "parent")?.answer_text || <span className="text-gray-400">아직 답변 없음</span>}
+                <div className="flex flex-col gap-4 mt-2">
+                  <div className="bg-secondary/10 rounded-xl p-4">
+                    <span className="font-bold text-secondary-foreground block mb-2">부모</span>
+                    {todayAnswers.find(a => a.role === "parent")?.answer_text || <span className="text-muted-foreground">아직 답변 없음</span>}
                     {todayAnswers.find(a => a.role === "parent") && (
-                      <span className="text-xs text-gray-400 ml-2">
+                      <span className="text-xs text-muted-foreground ml-2">
                         {new Date(todayAnswers.find(a => a.role === "parent").created_at).toLocaleString()}
                       </span>
                     )}
                   </div>
-                  <div className="flex-1 bg-green-50 rounded p-2">
-                    <span className="font-bold text-green-700">자녀: </span>
-                    {todayAnswers.find(a => a.role === "child")?.answer_text || <span className="text-gray-400">아직 답변 없음</span>}
+                  <div className="bg-accent/10 rounded-xl p-4">
+                    <span className="font-bold text-accent-foreground block mb-2">자녀</span>
+                    {todayAnswers.find(a => a.role === "child")?.answer_text || <span className="text-muted-foreground">아직 답변 없음</span>}
                     {todayAnswers.find(a => a.role === "child") && (
-                      <span className="text-xs text-gray-400 ml-2">
+                      <span className="text-xs text-muted-foreground ml-2">
                         {new Date(todayAnswers.find(a => a.role === "child").created_at).toLocaleString()}
                       </span>
                     )}
@@ -262,10 +262,10 @@ export default function RelationshipDetailPage() {
             </>
           )}
           {myTodayAnswer && question.status !== "2-reply" && (
-            <div className="mt-6 p-4 border rounded bg-blue-50">
-              <div className="text-xs text-gray-500 mb-1">내 답변</div>
-              <div className="font-medium">{myTodayAnswer.answer_text}</div>
-              <div className="text-xs text-gray-400 mt-1">{new Date(myTodayAnswer.created_at).toLocaleString()}</div>
+            <div className="mt-6 p-4 border rounded bg-secondary/10">
+              <div className="text-xs text-muted-foreground mb-1">내 답변</div>
+              <div className="font-medium text-foreground">{myTodayAnswer.answer_text}</div>
+              <div className="text-xs text-muted-foreground mt-1">{new Date(myTodayAnswer.created_at).toLocaleString()}</div>
             </div>
           )}
         </>

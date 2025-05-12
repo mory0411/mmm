@@ -95,64 +95,83 @@ export default function Dashboard() {
 
   return (
     <div className="max-w-xl mx-auto py-8">
-      {user && (
-        <div className="mb-4 text-sm text-gray-600">
-          로그인: {user.user_metadata?.nickname || user.email}
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-2xl font-bold text-foreground/90">MORY</h1>
+        {user && (
+          <Link href="/relationships/new">
+            <Button>새로운 관계 만들기</Button>
+          </Link>
+        )}
+      </div>
+
+      {user ? (
+        <div className="space-y-4">
+          {relationships.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-muted-foreground mb-4">아직 관계가 없습니다.</p>
+              <Link href="/relationships/new">
+                <Button>첫 번째 관계 만들기</Button>
+              </Link>
+            </div>
+          ) : (
+            <div className="grid gap-4">
+              {relationships.map((rel) => (
+                <div key={rel.id} className="border rounded-lg p-4 bg-card shadow-sm hover:shadow-md transition-shadow duration-200">
+                  <div className="flex flex-col gap-4">
+                    <div>
+                      <div className="text-base font-medium text-foreground mb-2">
+                        {editNameId === rel.id ? (
+                          <div className="flex flex-col gap-2">
+                            <input
+                              type="text"
+                              value={editNameValue}
+                              onChange={(e) => setEditNameValue(e.target.value)}
+                              className="text-base px-2 py-1 border rounded-lg bg-background w-full"
+                              placeholder="관계 이름을 입력하세요"
+                            />
+                            <div className="flex gap-2">
+                              <Button size="sm" onClick={() => handleSaveName(rel.id)}>저장</Button>
+                              <Button size="sm" variant="outline" onClick={() => setEditNameId(null)}>취소</Button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-between">
+                            <span>{myRelationshipNames[rel.id] || "이름 없음"}</span>
+                            <Button size="sm" variant="outline" className="h-7 px-2 text-xs text-muted-foreground hover:text-muted-foreground/80 border-muted-foreground/30 hover:border-muted-foreground/50" onClick={() => handleEditName(rel.id)}>
+                              이름수정
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                      <div className="text-sm text-muted-foreground mb-1">내 역할: {rel.parent_user_id === user.id ? "부모" : "자녀"}</div>
+                      <div className="text-sm text-muted-foreground mb-1">상대방: {otherProfiles[rel.id]?.nickname || "이름 없음"}</div>
+                    </div>
+                    <div className="flex gap-2">
+                      <Link href={`/r/${rel.hash_code}`} className="flex-1">
+                        <Button size="sm" className="w-full">입장하기</Button>
+                      </Link>
+                      <Button variant="secondary" size="sm" className="flex-1" onClick={() => {
+                        navigator.clipboard.writeText(`${window.location.origin}/r/${rel.hash_code}`);
+                        toast("공유 링크가 복사되었습니다!");
+                      }}>
+                        공유하기
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="text-center py-12">
+          <h2 className="text-2xl font-bold mb-4 text-foreground/90">가족과의 소중한 대화를 기록하세요</h2>
+          <p className="text-muted-foreground mb-8">매일 하나의 질문으로 가족과의 대화를 이어가세요.</p>
+          <Link href="/auth/login">
+            <Button size="lg">시작하기</Button>
+          </Link>
         </div>
       )}
-      <h1 className="text-2xl font-bold mb-4">내 관계 목록</h1>
-      <Link href="/relationships/new">
-        <Button className="mb-6">+ 새 관계 생성</Button>
-      </Link>
-      <div className="space-y-4">
-        {relationships.length === 0 && <div>참여 중인 관계가 없습요.</div>}
-        {relationships.map((rel) => (
-          <div key={rel.id} className="border rounded p-4 flex justify-between items-center">
-            <div>
-              <div className="text-lg font-bold mb-1 flex items-center gap-2">
-                {editNameId === rel.id ? (
-                  <>
-                    <input
-                      className="border rounded px-2 py-1"
-                      value={editNameValue}
-                      onChange={e => setEditNameValue(e.target.value)}
-                      maxLength={30}
-                    />
-                    <Button size="sm" onClick={() => handleSaveName(rel.id)} disabled={!editNameValue.trim()}>
-                      저장
-                    </Button>
-                    <Button size="sm" variant="ghost" onClick={() => setEditNameId(null)}>
-                      취소
-                    </Button>
-                  </>
-                ) : (
-                  <>
-                    {myRelationshipNames[rel.id] || <span className="text-gray-400">(별칭 없음)</span>}
-                    <Button size="sm" variant="outline" onClick={() => handleEditName(rel.id)}>
-                      수정버튼
-                    </Button>
-                  </>
-                )}
-              </div>
-              <div className="text-sm mb-1">
-                상대방: {otherProfiles[rel.id]?.nickname ? otherProfiles[rel.id].nickname : <span className="text-gray-400">(미참여)</span>}
-              </div>
-              <div className="text-sm mb-1">내 역할: {rel.parent_user_id === user.id ? "부모" : "자녀"}</div>
-            </div>
-            <div className="flex flex-col gap-2 items-end">
-              <Link href={`/r/${rel.hash_code}`}>
-                <Button>입장</Button>
-              </Link>
-              <Button variant="secondary" size="sm" onClick={() => {
-                navigator.clipboard.writeText(`${window.location.origin}/r/${rel.hash_code}`);
-                toast("공유 링크가 복사되었습니다!");
-              }}>
-                공유하기
-              </Button>
-            </div>
-          </div>
-        ))}
-      </div>
     </div>
   );
 }

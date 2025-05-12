@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 type QAGroup = {
   question_id: string;
@@ -61,41 +63,43 @@ export default function RelationshipHistoryPage() {
 
   return (
     <div className="max-w-xl mx-auto py-8">
-      <h1 className="text-2xl font-bold mb-4">과거 질문-답변 히스토리</h1>
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-bold">과거 질문-답변 히스토리</h1>
+        <Link href={`/r/${hash}`}>
+          <Button variant="outline" size="sm">이전으로</Button>
+        </Link>
+      </div>
       {loading ? (
-        <div className="text-gray-400">로딩 중...</div>
+        <div className="text-muted-foreground">로딩 중...</div>
       ) : qaGroups.length === 0 ? (
-        <div className="text-gray-400">아직 답변한 내용이 없습니다.</div>
+        <div className="text-muted-foreground">아직 답변한 내용이 없습니다.</div>
       ) : (
-        <ul className="space-y-6">
+        <ul className="space-y-8">
           {qaGroups.map((group) => (
-            <li key={group.question_id} className="border rounded-lg p-4 bg-white shadow">
-              <div className="font-semibold mb-2">{group.question_text}</div>
-              <div className="flex flex-row gap-4">
-                <div className="flex-1 bg-blue-50 rounded p-2">
-                  <span className="font-bold text-blue-700">부모: </span>
+            <li key={group.question_id} className="border rounded-2xl p-6 bg-card shadow-sm hover:shadow-md transition-shadow duration-200">
+              <div className="text-xs text-muted-foreground mb-1">
+                {new Date(group.parent?.created_at || group.child?.created_at).toLocaleDateString()}
+              </div>
+              <div className="font-medium mb-4 text-lg text-foreground/90">{group.question_text}</div>
+              <div className="flex flex-col gap-4">
+                <div className="bg-secondary/20 rounded-xl p-4">
+                  <span className="font-bold text-secondary-foreground block mb-2">부모</span>
                   {group.parent ? (
                     <>
-                      {group.parent.answer_text}
-                      <span className="text-xs text-gray-400 ml-2">
-                        {new Date(group.parent.created_at).toLocaleString()}
-                      </span>
+                      <div className="text-foreground/90">{group.parent.answer_text}</div>
                     </>
                   ) : (
-                    <span className="text-gray-400">아직 답변 없음</span>
+                    <span className="text-muted-foreground">아직 답변 없음</span>
                   )}
                 </div>
-                <div className="flex-1 bg-green-50 rounded p-2">
-                  <span className="font-bold text-green-700">자녀: </span>
+                <div className="bg-accent/20 rounded-xl p-4">
+                  <span className="font-bold text-accent-foreground block mb-2">자녀</span>
                   {group.child ? (
                     <>
-                      {group.child.answer_text}
-                      <span className="text-xs text-gray-400 ml-2">
-                        {new Date(group.child.created_at).toLocaleString()}
-                      </span>
+                      <div className="text-foreground/90">{group.child.answer_text}</div>
                     </>
                   ) : (
-                    <span className="text-gray-400">아직 답변 없음</span>
+                    <span className="text-muted-foreground">아직 답변 없음</span>
                   )}
                 </div>
               </div>
