@@ -154,7 +154,7 @@ export default function Dashboard() {
                         navigator.clipboard.writeText(`${window.location.origin}/r/${rel.hash_code}`);
                         toast("공유 링크가 복사되었습니다!");
                       }}>
-                        공유하기기
+                        공유하기
                       </Button>
                     </div>
                   </div>
